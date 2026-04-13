@@ -69,17 +69,66 @@
     }
 
     .hero {
-      padding: 18px 16px 14px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 128px;
+      padding: 18px 18px 16px;
       background: linear-gradient(135deg, #fff 0%, #fffaf3 60%, #fff2df 100%);
       border-bottom: 1px solid #efe6d9;
-      text-align: center;
+      text-align: left;
+      overflow: hidden;
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 1;
+      min-width: 0;
     }
 
     .hero-logo {
       display: block;
-      width: 82px;
+      width: 72px;
       height: auto;
-      margin: 0 auto 10px;
+      margin: 0 0 10px;
+    }
+
+    .radar-icon {
+      position: relative;
+      flex: 0 0 auto;
+      width: 108px;
+      height: 108px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 63% 49%, #f1d7c6 0 7px, transparent 8px),
+        repeating-radial-gradient(circle at 63% 49%, transparent 0 15px, rgba(234, 196, 169, 0.62) 16px 24px, transparent 25px 38px);
+      opacity: 0.92;
+    }
+
+    .radar-icon::before {
+      content: "";
+      position: absolute;
+      left: 55px;
+      top: 49px;
+      width: 42px;
+      height: 10px;
+      border-radius: 999px;
+      background: #f1d7c6;
+    }
+
+    .radar-icon::after {
+      content: "";
+      position: absolute;
+      inset: 18px 0 0 18px;
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      border: 10px solid rgba(241, 215, 198, 0.7);
+      border-right-color: transparent;
+      border-bottom-color: transparent;
+      transform: rotate(45deg);
     }
 
     .update-badge {
@@ -236,7 +285,20 @@
       padding-bottom: 14px;
     }
 
+    .event-toggle {
+      width: 100%;
+      height: 42px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
     .event-card {
+      position: relative;
       background: var(--card);
       border-radius: var(--radius);
       padding: 14px;
@@ -289,14 +351,34 @@
       font-weight: 600;
     }
 
+    .headline-arrow {
+      display: inline-block;
+      margin-left: 6px;
+      color: currentColor;
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1;
+      vertical-align: -1px;
+    }
+
+    .card-share-btn {
+      height: 32px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 8px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
     .event-headline.rise-title,
-    .timeline-headline.rise-title,
     .detail-title.rise-title {
       color: var(--rise);
     }
 
     .event-headline.fall-title,
-    .timeline-headline.fall-title,
     .detail-title.fall-title {
       color: var(--fall);
     }
@@ -438,11 +520,8 @@
       margin-bottom: 5px;
     }
 
-    .timeline-card {
-      background: #fff;
-      border: 1px solid #f1ece4;
-      border-radius: 12px;
-      padding: 10px 11px;
+    .timeline-content {
+      padding: 0;
     }
 
     .timeline-head {
@@ -638,6 +717,45 @@
       box-shadow: 0 -10px 30px rgba(0,0,0,0.18);
     }
 
+    .poster-sheet {
+      padding-bottom: 18px;
+    }
+
+    .poster-preview {
+      display: block;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      margin: 10px 0 12px;
+    }
+
+    .poster-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .poster-action {
+      flex: 1;
+      height: 42px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #151515;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .poster-action.secondary {
+      background: #fff;
+      color: var(--text);
+    }
+
     .sheet-handle {
       width: 44px;
       height: 5px;
@@ -689,14 +807,20 @@
 
     .radar-chart {
       width: 100%;
-      height: 190px;
+      height: 232px;
       display: block;
     }
 
+    .radar-keyword {
+      font-size: 11px;
+      fill: #1f1f1f;
+      font-weight: 800;
+    }
+
     .radar-axis {
-      font-size: 10px;
-      fill: #706b65;
-      font-weight: 600;
+      font-size: 11px;
+      fill: #5f5b56;
+      font-weight: 700;
     }
 
     .radar-value {
@@ -802,9 +926,12 @@
     </div>
 
     <header class="hero">
-      <img class="hero-logo" src="./容器%20(1).svg" alt="金十期货" />
-      <h1>期货极端行情追踪器</h1>
-      <div class="hero-time">2026年4月13日 15:00更新</div>
+      <div class="hero-copy">
+        <img class="hero-logo" src="./容器%20(1).svg" alt="金十期货" />
+        <h1>期货极端行情追踪器</h1>
+        <div class="hero-time">2026年4月13日 15:00更新</div>
+      </div>
+      <div class="radar-icon" aria-hidden="true"></div>
     </header>
 
     <section class="section">
@@ -829,12 +956,9 @@
     <section class="section" style="padding-bottom:18px;">
       <div class="section-title">
         <h2>品种时间线</h2>
-        <span class="meta">按品种查看历史事件</span>
       </div>
-      <div class="panel-card">
-        <div class="timeline-tabs" id="timelineTabs"></div>
-        <div id="timelineList"></div>
-      </div>
+      <div class="timeline-tabs" id="timelineTabs"></div>
+      <div id="timelineList"></div>
       <div class="risk" style="margin-top:14px;">风险提示：本页面展示的是代表性公开确认事件，不是交易所逐日逐合约扫描得到的全量样本，仅用于市场信息展示与事件复盘，不构成对任何品种的投资建议或交易建议。</div>
     </section>
 
@@ -864,6 +988,24 @@
     <div class="modal-sheet">
       <div class="sheet-handle"></div>
       <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="posterModal">
+    <div class="modal-sheet poster-sheet">
+      <div class="sheet-handle"></div>
+      <div class="detail-head">
+        <div>
+          <div class="detail-title">分享卡片</div>
+          <div class="detail-sub">长按图片保存，或点击按钮下载/分享。</div>
+        </div>
+        <button class="close-btn" id="posterCloseBtn">×</button>
+      </div>
+      <img class="poster-preview" id="posterImage" alt="事件分享卡片" />
+      <div class="poster-actions">
+        <a class="poster-action" id="posterDownload" download="金十期货事件卡片.png">下载图片</a>
+        <button class="poster-action secondary" id="posterNativeShare" type="button">分享图片</button>
+      </div>
     </div>
   </div>
 
@@ -1560,7 +1702,8 @@
 
     const state = {
       type: '全部',
-      timelineProduct: '碳酸锂'
+      timelineProduct: '碳酸锂',
+      eventsExpanded: false
     };
 
     function buildStats(events) {
@@ -1615,8 +1758,8 @@
     function renderStats() {
       const s = buildStats(MOCK_EVENTS);
       const stats = [
-        { label: '年内涨停事件数', value: s.riseCount, note: '涨停事件' },
-        { label: '年内跌停事件数', value: s.fallCount, note: '跌停事件' },
+        { label: '年内涨停事件数', value: s.riseCount, note: '' },
+        { label: '年内跌停事件数', value: s.fallCount, note: '' },
         { label: '极端行情最多品种', value: s.topProduct[0], note: `累计 ${s.topProduct[1]} 次` }
       ];
       const root = document.getElementById('stats');
@@ -1624,7 +1767,7 @@
         <div class="stat-strip">
           <div class="stat-label">${item.label}</div>
           <div class="stat-value">${item.value}</div>
-          <div class="stat-note">${item.note}</div>
+          ${item.note ? `<div class="stat-note">${item.note}</div>` : ''}
         </div>`).join('');
     }
 
@@ -1636,7 +1779,8 @@
         root.innerHTML = `<div class="panel-card"><div style="font-size:13px;color:#777;line-height:1.8;">当前筛选条件下暂无事件，可切换方向查看。</div></div>`;
         return;
       }
-      root.innerHTML = events.map(item => `
+      const visibleEvents = state.eventsExpanded ? events : events.slice(0, 3);
+      root.innerHTML = visibleEvents.map(item => `
         <div class="event-card" data-id="${item.event_id}">
           <div class="event-top">
             <div>
@@ -1646,7 +1790,7 @@
             </div>
             <div class="limit-tag ${item.event_type === '涨停' ? 'rise' : 'fall'}">${item.event_type}</div>
           </div>
-          <div class="event-headline ${item.event_type === '涨停' ? 'rise-title' : 'fall-title'}">${item.headline}</div>
+          <div class="event-headline ${item.event_type === '涨停' ? 'rise-title' : 'fall-title'}">${item.headline}<span class="headline-arrow">&gt;</span></div>
           <div class="event-summary">${item.summary}</div>
           <div class="mini-grid">
             <div class="mini-cell"><div class="k">事件级别</div><div class="v">${item.event_level}</div></div>
@@ -1654,8 +1798,13 @@
             <div class="mini-cell"><div class="k">涉及品种</div><div class="v">${item.products_list.length} 个</div></div>
           </div>
           <div class="tag-row">${item.tags.map(tag => `<span class="reason-tag">${tag}</span>`).join('')}</div>
+          <button class="card-share-btn" type="button" data-share-id="${item.event_id}">生成分享图</button>
         </div>
-      `).join('');
+      `).join('') + (events.length > 3 ? `
+        <button class="event-toggle" id="eventToggle" type="button">
+          ${state.eventsExpanded ? '收起事件' : `展开更多（剩余 ${events.length - 3} 条）`}
+        </button>
+      ` : '');
 
       Array.from(document.querySelectorAll('.event-card')).forEach(card => {
         card.addEventListener('click', async () => {
@@ -1663,6 +1812,20 @@
           openModal(detail);
         });
       });
+      Array.from(document.querySelectorAll('.card-share-btn')).forEach(button => {
+        button.addEventListener('click', async (event) => {
+          event.stopPropagation();
+          const detail = await fetchEventDetail(button.dataset.shareId);
+          await openPosterModal(detail);
+        });
+      });
+      const toggle = document.getElementById('eventToggle');
+      if (toggle) {
+        toggle.addEventListener('click', () => {
+          state.eventsExpanded = !state.eventsExpanded;
+          renderEvents();
+        });
+      }
     }
 
     async function renderTimeline() {
@@ -1683,9 +1846,9 @@
             <div class="timeline-node ${item.event_type === '跌停' ? 'fall-node' : ''}">
               <span class="timeline-dot"></span>
               <div class="timeline-date">${item.trade_date}</div>
-              <div class="timeline-card">
+              <div class="timeline-content">
                 <div class="timeline-head">
-                  <div class="timeline-headline ${item.event_type === '涨停' ? 'rise-title' : 'fall-title'}">${item.products_display}</div>
+                  <div class="timeline-headline">${item.products_display}</div>
                   <span class="timeline-pill ${item.event_type === '涨停' ? 'rise' : 'fall'}">${item.event_type}</span>
                 </div>
                 <div class="timeline-summary">${item.headline}</div>
@@ -1696,16 +1859,236 @@
       `;
     }
 
-    function buildReasonRadar(item) {
-      const axes = [
-        { label: '核心催化', value: Math.min(96, 58 + Math.round(item.core_driver.length / 8)) },
-        { label: '辅助因素', value: Math.min(94, 50 + Math.round(item.secondary_driver.length / 10) + item.tags.length * 3) },
-        { label: '背景因素', value: Math.min(92, 48 + Math.round(item.background_driver.length / 11) + Math.min(item.products_list.length, 8) * 3) },
-        { label: '待验证', value: Math.min(90, 45 + Math.round(item.pending_factor.length / 12) + item.consecutive_limit_count * 6) }
+    let currentPosterBlob = null;
+
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    }
+
+    function roundRectPath(ctx, x, y, w, h, r) {
+      const radius = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + w - radius, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+      ctx.lineTo(x + w, y + h - radius);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+      ctx.lineTo(x + radius, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
+      const chars = String(text || '').split('');
+      let line = '';
+      let lines = [];
+      chars.forEach(char => {
+        const testLine = line + char;
+        if (ctx.measureText(testLine).width > maxWidth && line) {
+          lines.push(line);
+          line = char;
+        } else {
+          line = testLine;
+        }
+      });
+      if (line) lines.push(line);
+      if (maxLines && lines.length > maxLines) {
+        lines = lines.slice(0, maxLines);
+        while (ctx.measureText(lines[lines.length - 1] + '...').width > maxWidth && lines[lines.length - 1].length > 1) {
+          lines[lines.length - 1] = lines[lines.length - 1].slice(0, -1);
+        }
+        lines[lines.length - 1] += '...';
+      }
+      lines.forEach((lineText, index) => ctx.fillText(lineText, x, y + index * lineHeight));
+      return y + lines.length * lineHeight;
+    }
+
+    function canvasToBlob(canvas) {
+      return new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
+    }
+
+    async function createEventPoster(item) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 750;
+      canvas.height = 1020;
+      const ctx = canvas.getContext('2d');
+      const rise = item.event_type === '涨停';
+      const theme = rise ? '#d14a3a' : '#1f9d55';
+
+      ctx.fillStyle = '#f3f3f0';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#ffffff';
+      roundRectPath(ctx, 42, 42, 666, 936, 16);
+      ctx.fill();
+      ctx.strokeStyle = '#1f1f1f';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      try {
+        const logo = await loadImage('./容器%20(1).svg');
+        const logoW = 150;
+        const logoH = logoW * (logo.height / logo.width);
+        ctx.drawImage(logo, 72, 76, logoW, logoH);
+      } catch (e) {
+        ctx.fillStyle = '#111';
+        ctx.font = '700 30px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+        ctx.fillText('金十期货', 72, 108);
+      }
+
+      ctx.fillStyle = '#70706a';
+      ctx.font = '24px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('2026年4月13日 15:00更新', 678, 108);
+      ctx.textAlign = 'left';
+
+      ctx.fillStyle = theme;
+      roundRectPath(ctx, 72, 148, 96, 42, 21);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = '700 24px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+      ctx.fillText(item.event_type, 96, 177);
+
+      ctx.fillStyle = '#111';
+      ctx.font = '700 36px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+      const titleY = drawWrappedText(ctx, item.headline, 72, 238, 606, 48, 3);
+
+      ctx.fillStyle = '#70706a';
+      ctx.font = '24px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+      ctx.fillText(`${item.trade_date} · ${item.products_display} · ${item.sector_name}`, 72, titleY + 18);
+
+      const gridY = titleY + 58;
+      const cells = [
+        ['事件级别', item.event_level],
+        ['行情特征', item.close_status],
+        ['涉及品种', `${item.products_list.length} 个`]
       ];
-      const cx = 120;
-      const cy = 86;
-      const maxR = 58;
+      cells.forEach(([k, v], index) => {
+        const x = 72 + index * 204;
+        roundRectPath(ctx, x, gridY, 184, 88, 8);
+        ctx.fillStyle = '#f7f7f4';
+        ctx.fill();
+        ctx.strokeStyle = '#d8d8d2';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.fillStyle = '#70706a';
+        ctx.font = '20px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+        ctx.fillText(k, x + 18, gridY + 30);
+        ctx.fillStyle = '#111';
+        ctx.font = '700 23px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+        drawWrappedText(ctx, v, x + 18, gridY + 64, 148, 26, 1);
+      });
+
+      ctx.fillStyle = '#3c3c3c';
+      ctx.font = '25px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+      const summaryY = drawWrappedText(ctx, item.summary, 72, gridY + 138, 606, 40, 5);
+
+      let tagX = 72;
+      let tagY = summaryY + 26;
+      ctx.font = '700 21px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+      item.tags.slice(0, 4).forEach(tag => {
+        const w = Math.min(ctx.measureText(tag).width + 34, 220);
+        if (tagX + w > 678) {
+          tagX = 72;
+          tagY += 44;
+        }
+        roundRectPath(ctx, tagX, tagY, w, 34, 8);
+        ctx.fillStyle = '#efefeb';
+        ctx.fill();
+        ctx.strokeStyle = '#d8d8d2';
+        ctx.stroke();
+        ctx.fillStyle = '#242424';
+        ctx.fillText(tag, tagX + 17, tagY + 24);
+        tagX += w + 10;
+      });
+
+      ctx.strokeStyle = '#d8d8d2';
+      ctx.beginPath();
+      ctx.moveTo(72, 805);
+      ctx.lineTo(678, 805);
+      ctx.stroke();
+
+      try {
+        const qr = await loadImage('./下载app二维码.jpg');
+        ctx.drawImage(qr, 540, 830, 112, 112);
+      } catch (e) {
+        ctx.strokeStyle = '#111';
+        ctx.strokeRect(540, 830, 112, 112);
+      }
+      ctx.fillStyle = '#111';
+      ctx.font = '700 26px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+      ctx.fillText('下载金十期货APP', 72, 858);
+      ctx.fillStyle = '#70706a';
+      ctx.font = '22px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+      ctx.fillText('扫码获取品种异动信息', 72, 894);
+      ctx.font = '18px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+      drawWrappedText(ctx, '公开信息整理，仅用于市场信息展示与事件复盘，不构成投资建议。', 72, 934, 420, 28, 2);
+
+      return canvas;
+    }
+
+    async function openPosterModal(item) {
+      const modal = document.getElementById('posterModal');
+      const image = document.getElementById('posterImage');
+      const download = document.getElementById('posterDownload');
+      image.removeAttribute('src');
+      modal.classList.add('show');
+
+      const canvas = await createEventPoster(item);
+      const dataUrl = canvas.toDataURL('image/png');
+      currentPosterBlob = await canvasToBlob(canvas);
+      image.src = dataUrl;
+      download.href = dataUrl;
+      download.download = `金十期货-${item.products_list[0]}-${item.event_type}.png`;
+    }
+
+    function closePosterModal() {
+      document.getElementById('posterModal').classList.remove('show');
+    }
+
+    async function sharePosterImage() {
+      if (!currentPosterBlob) return;
+      const file = new File([currentPosterBlob], '金十期货事件卡片.png', { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: '金十期货事件卡片',
+          text: '期货极端行情事件卡片'
+        });
+      } else {
+        document.getElementById('posterDownload').click();
+      }
+    }
+
+    function buildReasonRadar(item) {
+      const escapeSvgText = (text) => String(text || '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[char]));
+      const keywords = [
+        item.tags[0] || item.event_level,
+        item.tags[1] || item.close_status,
+        item.tags[2] || item.sector_name,
+        item.tags[3] || item.products_list[0]
+      ];
+      const axes = [
+        { label: '核心催化', keyword: keywords[0], value: Math.min(96, 58 + Math.round(item.core_driver.length / 8)) },
+        { label: '辅助因素', keyword: keywords[1], value: Math.min(94, 50 + Math.round(item.secondary_driver.length / 10) + item.tags.length * 3) },
+        { label: '背景因素', keyword: keywords[2], value: Math.min(92, 48 + Math.round(item.background_driver.length / 11) + Math.min(item.products_list.length, 8) * 3) },
+        { label: '待验证', keyword: keywords[3], value: Math.min(90, 45 + Math.round(item.pending_factor.length / 12) + item.consecutive_limit_count * 6) }
+      ];
+      const cx = 150;
+      const cy = 108;
+      const maxR = 56;
       const color = item.event_type === '涨停' ? '#d14a3a' : '#1f9d55';
       const fill = item.event_type === '涨停' ? 'rgba(209,74,58,0.16)' : 'rgba(31,157,85,0.16)';
 
@@ -1733,17 +2116,19 @@
         return `<line x1="${cx}" y1="${cy}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}" stroke="#e8dfd3" stroke-width="1"></line>`;
       }).join('');
       const labels = axes.map((axis, idx) => {
-        const p = pointFor(116, idx);
+        const p = pointFor(138, idx);
         const anchor = idx === 1 ? 'start' : idx === 3 ? 'end' : 'middle';
-        const labelDy = idx === 0 ? -6 : idx === 2 ? 12 : -3;
+        const keywordDy = idx === 0 ? -12 : idx === 2 ? 10 : -2;
+        const axisDy = keywordDy + 14;
         return `
-          <text class="radar-axis" x="${p.x.toFixed(1)}" y="${(p.y + labelDy).toFixed(1)}" text-anchor="${anchor}">${axis.label}</text>
+          <text class="radar-keyword" x="${p.x.toFixed(1)}" y="${(p.y + keywordDy).toFixed(1)}" text-anchor="${anchor}">${escapeSvgText(axis.keyword)}</text>
+          <text class="radar-axis" x="${p.x.toFixed(1)}" y="${(p.y + axisDy).toFixed(1)}" text-anchor="${anchor}">${axis.label}</text>
         `;
       }).join('');
 
       return `
         <div class="radar-panel">
-          <svg class="radar-chart" viewBox="0 0 240 172" role="img" aria-label="原因拆解雷达图">
+          <svg class="radar-chart" viewBox="0 0 300 232" role="img" aria-label="原因拆解雷达图">
             ${rings}
             ${spokes}
             <polygon points="${polygon}" fill="${fill}" stroke="${color}" stroke-width="2.2"></polygon>
@@ -1884,6 +2269,7 @@
       const types = ['全部', '涨停', '跌停'];
       renderChips('typeChips', types, state.type, value => {
         state.type = value;
+        state.eventsExpanded = false;
         initFilters();
         renderEvents();
       });
@@ -1891,6 +2277,15 @@
 
     document.getElementById('modal').addEventListener('click', (e) => {
       if (e.target.id === 'modal') closeModal();
+    });
+    document.getElementById('posterModal').addEventListener('click', (e) => {
+      if (e.target.id === 'posterModal') closePosterModal();
+    });
+    document.getElementById('posterCloseBtn').addEventListener('click', closePosterModal);
+    document.getElementById('posterNativeShare').addEventListener('click', () => {
+      sharePosterImage().catch(() => {
+        document.getElementById('posterDownload').click();
+      });
     });
 
     async function init() {
