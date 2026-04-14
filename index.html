@@ -285,6 +285,10 @@
       padding-bottom: 14px;
     }
 
+    .event-list-wrap {
+      position: relative;
+    }
+
     .event-toggle {
       width: 100%;
       height: 42px;
@@ -295,6 +299,7 @@
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
+      margin: 0 0 14px;
     }
 
     .event-card {
@@ -586,6 +591,60 @@
     }
 
     .timeline-tabs::-webkit-scrollbar { display: none; }
+
+    .timeline-search-wrap {
+      position: relative;
+      margin: 2px 0 10px;
+    }
+
+    .timeline-search-wrap::before {
+      content: "";
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      width: 12px;
+      height: 12px;
+      border: 1.8px solid #70706a;
+      border-radius: 50%;
+      transform: translateY(-58%);
+      pointer-events: none;
+    }
+
+    .timeline-search-wrap::after {
+      content: "";
+      position: absolute;
+      left: 24px;
+      top: 24px;
+      width: 8px;
+      height: 1.8px;
+      background: #70706a;
+      transform: rotate(45deg);
+      transform-origin: left center;
+      pointer-events: none;
+    }
+
+    .timeline-search {
+      width: 100%;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      padding: 0 12px 0 38px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .timeline-search::placeholder {
+      color: #9b9b96;
+    }
+
+    .timeline-empty {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+      padding: 8px 0 12px;
+    }
 
     .tab {
       border: 1px solid #efe6d9;
@@ -950,12 +1009,18 @@
           <div class="inline-chips" id="typeChips"></div>
         </div>
       </div>
-      <div class="event-list" id="eventList"></div>
+      <div class="event-list-wrap">
+        <div class="event-list" id="eventList"></div>
+        <button class="event-toggle" id="eventToggle" type="button" style="display:none;"></button>
+      </div>
     </section>
 
     <section class="section" style="padding-bottom:18px;">
       <div class="section-title">
         <h2>品种时间线</h2>
+      </div>
+      <div class="timeline-search-wrap">
+        <input class="timeline-search" id="timelineSearch" type="search" placeholder="搜索品种，如：多晶硅、碳酸锂、原油" />
       </div>
       <div class="timeline-tabs" id="timelineTabs"></div>
       <div id="timelineList"></div>
@@ -1703,6 +1768,7 @@
     const state = {
       type: '全部',
       timelineProduct: '碳酸锂',
+      timelineSearch: '',
       eventsExpanded: false
     };
 
@@ -1777,6 +1843,7 @@
       const root = document.getElementById('eventList');
       if (!events.length) {
         root.innerHTML = `<div class="panel-card"><div style="font-size:13px;color:#777;line-height:1.8;">当前筛选条件下暂无事件，可切换方向查看。</div></div>`;
+        document.getElementById('eventToggle').style.display = 'none';
         return;
       }
       const visibleEvents = state.eventsExpanded ? events : events.slice(0, 3);
@@ -1800,11 +1867,16 @@
           <div class="tag-row">${item.tags.map(tag => `<span class="reason-tag">${tag}</span>`).join('')}</div>
           <button class="card-share-btn" type="button" data-share-id="${item.event_id}">生成分享图</button>
         </div>
-      `).join('') + (events.length > 3 ? `
-        <button class="event-toggle" id="eventToggle" type="button">
-          ${state.eventsExpanded ? '收起事件' : `展开更多（剩余 ${events.length - 3} 条）`}
-        </button>
-      ` : '');
+      `).join('');
+
+      const toggle = document.getElementById('eventToggle');
+      if (events.length > 3) {
+        toggle.style.display = '';
+        toggle.className = 'event-toggle';
+        toggle.textContent = state.eventsExpanded ? '收起事件' : `展开更多（剩余 ${events.length - 3} 条）`;
+      } else {
+        toggle.style.display = 'none';
+      }
 
       Array.from(document.querySelectorAll('.event-card')).forEach(card => {
         card.addEventListener('click', async () => {
@@ -1819,21 +1891,30 @@
           await openPosterModal(detail);
         });
       });
-      const toggle = document.getElementById('eventToggle');
       if (toggle) {
-        toggle.addEventListener('click', () => {
+        toggle.onclick = () => {
           state.eventsExpanded = !state.eventsExpanded;
           renderEvents();
-        });
+        };
       }
     }
 
     async function renderTimeline() {
-      const products = uniqueProducts(MOCK_EVENTS);
-      if (!products.includes(state.timelineProduct)) state.timelineProduct = products[0];
-      const tabs = document.getElementById('timelineTabs');
-      tabs.innerHTML = products.map(name => `<button class="tab ${name === state.timelineProduct ? 'active' : ''}" data-name="${name}">${name}</button>`).join('');
-      Array.from(tabs.querySelectorAll('.tab')).forEach(tab => {
+      const allProducts = uniqueProducts(MOCK_EVENTS);
+      const keyword = state.timelineSearch.trim().toLowerCase();
+      const products = keyword
+        ? allProducts.filter(name => name.toLowerCase().includes(keyword))
+        : allProducts;
+      if (!products.includes(state.timelineProduct)) state.timelineProduct = products[0] || '';
+
+      const productTabs = document.getElementById('timelineTabs');
+      if (!products.length) {
+        productTabs.innerHTML = `<div class="timeline-empty">当前板块下没有匹配的品种。</div>`;
+        document.getElementById('timelineList').innerHTML = '';
+        return;
+      }
+      productTabs.innerHTML = products.map(name => `<button class="tab ${name === state.timelineProduct ? 'active' : ''}" data-name="${name}">${name}</button>`).join('');
+      Array.from(productTabs.querySelectorAll('.tab')).forEach(tab => {
         tab.addEventListener('click', () => {
           state.timelineProduct = tab.dataset.name;
           renderTimeline();
@@ -2275,6 +2356,17 @@
       });
     }
 
+    function initTimelineSearch() {
+      const input = document.getElementById('timelineSearch');
+      if (!input) return;
+      input.value = state.timelineSearch;
+      input.addEventListener('input', () => {
+        state.timelineSearch = input.value;
+        state.timelineProduct = '';
+        renderTimeline();
+      });
+    }
+
     document.getElementById('modal').addEventListener('click', (e) => {
       if (e.target.id === 'modal') closeModal();
     });
@@ -2292,6 +2384,7 @@
       await fetchExtremeEvents();
       renderStats();
       initFilters();
+      initTimelineSearch();
       renderEvents();
       renderTimeline();
       initAppEnvironment();
