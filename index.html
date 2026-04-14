@@ -858,7 +858,26 @@
       border-radius: 8px;
       border: 1px solid var(--line);
       background: #fff;
-      margin: 10px 0 0;
+      margin: 10px 0 12px;
+    }
+
+    .poster-actions {
+      display: flex;
+    }
+
+    .poster-action {
+      width: 100%;
+      height: 42px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #151515;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .sheet-handle {
@@ -1112,6 +1131,9 @@
         <button class="close-btn" id="posterCloseBtn">×</button>
       </div>
       <img class="poster-preview" id="posterImage" alt="事件分享卡片" />
+      <div class="poster-actions">
+        <a class="poster-action" id="posterDownload" download="金十期货事件卡片.png">下载图片</a>
+      </div>
     </div>
   </div>
 
@@ -2257,12 +2279,15 @@
 
       const modal = document.getElementById('posterModal');
       const image = document.getElementById('posterImage');
+      const download = document.getElementById('posterDownload');
       image.removeAttribute('src');
       modal.classList.add('show');
 
       const dataUrl = canvas.toDataURL('image/png');
       currentPosterBlob = await canvasToBlob(canvas);
       image.src = dataUrl;
+      download.href = dataUrl;
+      download.download = `金十期货-${item.products_list[0]}-${item.event_type}.png`;
     }
 
     function closePosterModal() {
