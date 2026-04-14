@@ -878,6 +878,26 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
+    }
+
+    .poster-action.is-error {
+      background: #d14a3a;
+      color: #fff;
+    }
+
+    .poster-share-action {
+      display: none;
+    }
+
+    @media (max-width: 767px) {
+      .poster-download-action {
+        display: none;
+      }
+
+      .poster-share-action {
+        display: flex;
+      }
     }
 
     .sheet-handle {
@@ -1132,7 +1152,8 @@
       </div>
       <img class="poster-preview" id="posterImage" alt="事件分享卡片" />
       <div class="poster-actions">
-        <a class="poster-action" id="posterDownload" download="金十期货事件卡片.png">下载图片</a>
+        <a class="poster-action poster-download-action" id="posterDownload" download="金十期货事件卡片.png">下载图片</a>
+        <button class="poster-action poster-share-action" id="posterShareBtn" type="button">分享</button>
       </div>
     </div>
   </div>
@@ -1950,8 +1971,13 @@
       Array.from(document.querySelectorAll('.card-share-btn')).forEach(button => {
         button.addEventListener('click', async (event) => {
           event.stopPropagation();
-          const detail = await fetchEventDetail(button.dataset.shareId);
-          await openPosterModal(detail);
+          try {
+            const detail = await fetchEventDetail(button.dataset.shareId);
+            await openPosterModal(detail);
+          } catch (error) {
+            console.error('生成分享图失败', error);
+            window.alert('分享图生成失败，请稍后重试。');
+          }
         });
       });
       if (toggle) {
@@ -2192,10 +2218,6 @@
       return canvas;
     }
 
-    function isMobileViewport() {
-      return window.matchMedia('(max-width: 767px)').matches;
-    }
-
     function getMarketBridge() {
       if (typeof window.Jin10JSBridge === 'undefined') return null;
       try {
@@ -2232,55 +2254,42 @@
       return copied;
     }
 
-    async function sharePosterOnMobile(item, canvas) {
-      currentPosterBlob = await canvasToBlob(canvas);
+    async function sharePosterPage() {
       const shareUrl = window.location.href;
+      const button = document.getElementById('posterShareBtn');
+      const defaultText = button?.dataset.defaultText || button?.textContent || '分享';
+      if (button) button.dataset.defaultText = defaultText;
       const bridge = getMarketBridge();
       if (bridge && bridge.isApp) {
         try {
           bridge.dispatch('appShare', { url: shareUrl });
+          if (button) button.textContent = '已调起分享';
           return;
         } catch (error) {
-          console.warn('appShare 调用失败，降级为浏览器分享', error);
+          console.warn('appShare 调用失败，降级为复制链接', error);
         }
       }
 
-      const file = new File([currentPosterBlob], `金十期货-${item.products_list[0]}-${item.event_type}.png`, { type: 'image/png' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: '金十期货事件卡片',
-          text: item.headline
-        });
-        return;
-      }
-
-      if (navigator.share) {
-        await navigator.share({
-          title: '金十期货事件卡片',
-          text: item.headline,
-          url: shareUrl
-        });
-        return;
-      }
-
       const copied = await copyPageUrl(shareUrl);
-      if (!copied) {
-        window.alert('当前浏览器暂不支持分享，请复制页面链接后分享。');
+      if (button) {
+        button.textContent = copied ? '链接已复制' : '复制失败';
+        button.classList.toggle('is-error', !copied);
+        window.setTimeout(() => {
+          button.textContent = defaultText;
+          button.classList.remove('is-error');
+        }, 1800);
       }
     }
 
     async function openPosterModal(item) {
       const canvas = await createEventPoster(item);
-      if (isMobileViewport()) {
-        await sharePosterOnMobile(item, canvas);
-        return;
-      }
-
       const modal = document.getElementById('posterModal');
       const image = document.getElementById('posterImage');
       const download = document.getElementById('posterDownload');
+      const shareButton = document.getElementById('posterShareBtn');
       image.removeAttribute('src');
+      shareButton.textContent = shareButton.dataset.defaultText || '分享';
+      shareButton.classList.remove('is-error');
       modal.classList.add('show');
 
       const dataUrl = canvas.toDataURL('image/png');
@@ -2615,6 +2624,12 @@
       if (e.target.id === 'posterModal') closePosterModal();
     });
     document.getElementById('posterCloseBtn').addEventListener('click', closePosterModal);
+    document.getElementById('posterShareBtn').addEventListener('click', () => {
+      sharePosterPage().catch((error) => {
+        console.error('分享失败', error);
+        window.alert('分享失败，请稍后重试。');
+      });
+    });
 
     async function init() {
       await fetchExtremeEvents();
