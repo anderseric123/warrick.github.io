@@ -5,6 +5,78 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>期货极端行情追踪器</title>
+  <link href="//cdn.jin10.com/assets/img/commons/favicon.ico" type="image/x-icon" rel="icon" />
+  <script src="https://cdn.jin10.com/plugins/jsBridge/index.js"></script>
+  <link href="./css/test-env-tag.css" rel="stylesheet" />
+  <script>
+    function stat(sites) {
+      const parsedSites = stat._parseSites(sites);
+      if (parsedSites.indexOf('1000171913') > -1) {
+        parsedSites.push('1253039837');
+      }
+      parsedSites.forEach((site) => {
+        const script = stat._createScript(site);
+        document.head.appendChild(script);
+      });
+    }
+
+    stat._parseSites = function (sites = []) {
+      sites = [].concat(sites);
+      if (stat.commonIncluded) {
+        sites.unshift('common');
+      }
+      const parse = (site) => stat.sites[site] || site;
+      const unique = (arr) => {
+        const newArr = [];
+        for (let i = 0; i < arr.length; i++) {
+          const item = arr[i];
+          if (newArr.indexOf(item) === -1) {
+            newArr.push(item);
+          }
+        }
+        return newArr;
+      };
+      return unique(sites.map(parse));
+    };
+
+    stat._createScript = function (id) {
+      const script = document.createElement('script');
+      const protocol = location.protocol;
+      const args = [];
+      args.push(`id=${id}`);
+      args.push(`web_id=${id}`);
+      args.push('async=1');
+      script.charset = 'utf-8';
+      script.type = 'text/javascript';
+      script.async = true;
+      script.src = `${protocol}//s96.cnzz.com/z_stat.php?${args.join('&')}`;
+      return script;
+    };
+
+    stat.commonIncluded = true;
+    stat.sites = {
+      common: '1000171913',
+      vip: '1255889801',
+      diary: '1262999091',
+      hero: '1262999091',
+      news: '1254618299',
+      video: '1253231394',
+      calendar: '1253656910',
+      datacenter: '1261933372',
+    };
+
+    let cnzzStatInitialized = false;
+
+    function initCnzzStat() {
+      if (cnzzStatInitialized) return;
+      cnzzStatInitialized = true;
+      try {
+        stat();
+      } catch (error) {
+        console.warn('cnzzStat 初始化失败', error);
+      }
+    }
+  </script>
   <style>
     :root {
       --bg: #f5f5f3;
@@ -786,33 +858,7 @@
       border-radius: 8px;
       border: 1px solid var(--line);
       background: #fff;
-      margin: 10px 0 12px;
-    }
-
-    .poster-actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    .poster-action {
-      flex: 1;
-      height: 42px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      background: #151515;
-      color: #fff;
-      font-size: 13px;
-      font-weight: 700;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    .poster-action.secondary {
-      background: #fff;
-      color: var(--text);
+      margin: 10px 0 0;
     }
 
     .sheet-handle {
@@ -979,14 +1025,14 @@
 <body>
   <div class="wrap">
     <div class="page-watermarks" aria-hidden="true">
-      <img class="page-watermark top" src="./金十期货水印.png" alt="" />
-      <img class="page-watermark middle" src="./金十期货水印.png" alt="" />
-      <img class="page-watermark bottom" src="./金十期货水印.png" alt="" />
+      <img class="page-watermark top" src="./img/extreme_market_tracker/watermark.png" alt="" />
+      <img class="page-watermark middle" src="./img/extreme_market_tracker/watermark.png" alt="" />
+      <img class="page-watermark bottom" src="./img/extreme_market_tracker/watermark.png" alt="" />
     </div>
 
     <header class="hero">
       <div class="hero-copy">
-        <img class="hero-logo" src="./容器%20(1).svg" alt="金十期货" />
+        <img class="hero-logo" src="./img/extreme_market_tracker/logo.svg" alt="金十期货" />
         <h1>期货极端行情追踪器</h1>
         <div class="hero-time">2026年4月13日 15:00更新</div>
       </div>
@@ -1062,15 +1108,10 @@
       <div class="detail-head">
         <div>
           <div class="detail-title">分享卡片</div>
-          <div class="detail-sub">长按图片保存，或点击按钮下载/分享。</div>
         </div>
         <button class="close-btn" id="posterCloseBtn">×</button>
       </div>
       <img class="poster-preview" id="posterImage" alt="事件分享卡片" />
-      <div class="poster-actions">
-        <a class="poster-action" id="posterDownload" download="金十期货事件卡片.png">下载图片</a>
-        <button class="poster-action secondary" id="posterNativeShare" type="button">分享图片</button>
-      </div>
     </div>
   </div>
 
@@ -1991,6 +2032,13 @@
       return y + lines.length * lineHeight;
     }
 
+    function formatPosterUpdateDate(tradeDate) {
+      const match = String(tradeDate || '').match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if (!match) return '更新';
+      const [, year, month, day] = match;
+      return `${year}年${Number(month)}月${Number(day)}日更新`;
+    }
+
     function canvasToBlob(canvas) {
       return new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
     }
@@ -2013,7 +2061,7 @@
       ctx.stroke();
 
       try {
-        const logo = await loadImage('./容器%20(1).svg');
+        const logo = await loadImage('./img/extreme_market_tracker/logo.svg');
         const logoW = 150;
         const logoH = logoW * (logo.height / logo.width);
         ctx.drawImage(logo, 72, 76, logoW, logoH);
@@ -2026,7 +2074,7 @@
       ctx.fillStyle = '#70706a';
       ctx.font = '24px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText('2026年4月13日 15:00更新', 678, 108);
+      ctx.fillText(formatPosterUpdateDate(item.trade_date), 678, 108);
       ctx.textAlign = 'left';
 
       ctx.fillStyle = theme;
@@ -2042,9 +2090,17 @@
 
       ctx.fillStyle = '#70706a';
       ctx.font = '24px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
-      ctx.fillText(`${item.trade_date} · ${item.products_display} · ${item.sector_name}`, 72, titleY + 18);
+      const metaBottomY = drawWrappedText(
+        ctx,
+        `${item.trade_date} · ${item.products_display} · ${item.sector_name}`,
+        72,
+        titleY + 18,
+        606,
+        34,
+        3
+      );
 
-      const gridY = titleY + 58;
+      const gridY = metaBottomY + 22;
       const cells = [
         ['事件级别', item.event_level],
         ['行情特征', item.close_status],
@@ -2096,7 +2152,7 @@
       ctx.stroke();
 
       try {
-        const qr = await loadImage('./下载app二维码的的.jpg');
+        const qr = await loadImage('./img/extreme_market_tracker/app_qr.jpg');
         ctx.drawImage(qr, 540, 830, 112, 112);
       } catch (e) {
         ctx.strokeStyle = '#111';
@@ -2114,37 +2170,103 @@
       return canvas;
     }
 
-    async function openPosterModal(item) {
-      const modal = document.getElementById('posterModal');
-      const image = document.getElementById('posterImage');
-      const download = document.getElementById('posterDownload');
-      image.removeAttribute('src');
-      modal.classList.add('show');
+    function isMobileViewport() {
+      return window.matchMedia('(max-width: 767px)').matches;
+    }
 
-      const canvas = await createEventPoster(item);
-      const dataUrl = canvas.toDataURL('image/png');
+    function getMarketBridge() {
+      if (typeof window.Jin10JSBridge === 'undefined') return null;
+      try {
+        return new window.Jin10JSBridge();
+      } catch (error) {
+        console.warn('Jin10JSBridge 初始化失败', error);
+        return null;
+      }
+    }
+
+    async function copyPageUrl(url) {
+      if (navigator.clipboard?.writeText && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+        return true;
+      }
+
+      const textarea = document.createElement('textarea');
+      textarea.value = url;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.top = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.select();
+      textarea.setSelectionRange(0, textarea.value.length);
+
+      let copied = false;
+      try {
+        copied = document.execCommand('copy');
+      } catch (error) {
+        copied = false;
+      }
+
+      document.body.removeChild(textarea);
+      return copied;
+    }
+
+    async function sharePosterOnMobile(item, canvas) {
       currentPosterBlob = await canvasToBlob(canvas);
-      image.src = dataUrl;
-      download.href = dataUrl;
-      download.download = `金十期货-${item.products_list[0]}-${item.event_type}.png`;
-    }
+      const shareUrl = window.location.href;
+      const bridge = getMarketBridge();
+      if (bridge && bridge.isApp) {
+        try {
+          bridge.dispatch('appShare', { url: shareUrl });
+          return;
+        } catch (error) {
+          console.warn('appShare 调用失败，降级为浏览器分享', error);
+        }
+      }
 
-    function closePosterModal() {
-      document.getElementById('posterModal').classList.remove('show');
-    }
-
-    async function sharePosterImage() {
-      if (!currentPosterBlob) return;
-      const file = new File([currentPosterBlob], '金十期货事件卡片.png', { type: 'image/png' });
+      const file = new File([currentPosterBlob], `金十期货-${item.products_list[0]}-${item.event_type}.png`, { type: 'image/png' });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
           title: '金十期货事件卡片',
-          text: '期货极端行情事件卡片'
+          text: item.headline
         });
-      } else {
-        document.getElementById('posterDownload').click();
+        return;
       }
+
+      if (navigator.share) {
+        await navigator.share({
+          title: '金十期货事件卡片',
+          text: item.headline,
+          url: shareUrl
+        });
+        return;
+      }
+
+      const copied = await copyPageUrl(shareUrl);
+      if (!copied) {
+        window.alert('当前浏览器暂不支持分享，请复制页面链接后分享。');
+      }
+    }
+
+    async function openPosterModal(item) {
+      const canvas = await createEventPoster(item);
+      if (isMobileViewport()) {
+        await sharePosterOnMobile(item, canvas);
+        return;
+      }
+
+      const modal = document.getElementById('posterModal');
+      const image = document.getElementById('posterImage');
+      image.removeAttribute('src');
+      modal.classList.add('show');
+
+      const dataUrl = canvas.toDataURL('image/png');
+      currentPosterBlob = await canvasToBlob(canvas);
+      image.src = dataUrl;
+    }
+
+    function closePosterModal() {
+      document.getElementById('posterModal').classList.remove('show');
     }
 
     function buildReasonRadar(item) {
@@ -2367,6 +2489,100 @@
       });
     }
 
+    function initTestEnvTag() {
+      const hostname = window.location.hostname;
+      if (!hostname.startsWith('frontend-test.jin10.com') && !['localhost', '127.0.0.1', 'local.jin10.com'].includes(hostname)) {
+        return;
+      }
+
+      if (document.getElementById('test-env-tag')) return;
+
+      const tag = document.createElement('div');
+      tag.id = 'test-env-tag';
+      tag.innerHTML = `
+        <span class="mobile-text flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/><path d="M12 20v-9"/><path d="M6.53 9C4.6 8.8 3 7.1 3 5"/><path d="M6 13H2"/><path d="M3 21c0-2.1 1.7-3.9 3.8-4"/><path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/><path d="M22 13h-4"/><path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg>
+        </span>
+        <span class="pc-text">测试环境</span>
+      `;
+      document.body.appendChild(tag);
+
+      let isDragging = false;
+      let isMoved = false;
+      let startX = 0;
+      let startY = 0;
+      let initialLeft = 0;
+      let initialTop = 0;
+      let clientWidth = document.documentElement.clientWidth;
+      let clientHeight = document.documentElement.clientHeight;
+
+      const snapToEdge = () => {
+        const rect = tag.getBoundingClientRect();
+        const tagX = rect.left + rect.width / 2;
+        tag.style.left = tagX < clientWidth / 2 ? '10px' : (clientWidth - rect.width - 10) + 'px';
+        if (rect.top < 0) tag.style.top = '10px';
+        if (rect.bottom > clientHeight) tag.style.top = (clientHeight - rect.height - 10) + 'px';
+      };
+
+      const onDragStart = (event) => {
+        isDragging = true;
+        isMoved = false;
+        tag.classList.add('dragging');
+        const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+        const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+        const rect = tag.getBoundingClientRect();
+        startX = clientX;
+        startY = clientY;
+        initialLeft = rect.left;
+        initialTop = rect.top;
+      };
+
+      const onDragMove = (event) => {
+        if (!isDragging) return;
+        if (event.cancelable) event.preventDefault();
+        const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+        const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+        const dx = clientX - startX;
+        const dy = clientY - startY;
+        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) isMoved = true;
+        tag.style.left = (initialLeft + dx) + 'px';
+        tag.style.top = (initialTop + dy) + 'px';
+      };
+
+      const onDragEnd = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        tag.classList.remove('dragging');
+        snapToEdge();
+      };
+
+      window.addEventListener('resize', () => {
+        clientWidth = document.documentElement.clientWidth;
+        clientHeight = document.documentElement.clientHeight;
+        if (!isDragging) snapToEdge();
+      });
+      tag.addEventListener('mousedown', onDragStart);
+      tag.addEventListener('touchstart', onDragStart, { passive: false });
+      document.addEventListener('mousemove', onDragMove, { passive: false });
+      document.addEventListener('touchmove', onDragMove, { passive: false });
+      document.addEventListener('mouseup', onDragEnd);
+      document.addEventListener('touchend', onDragEnd);
+      tag.addEventListener('click', () => {
+        if (isMoved) return;
+        if (window.eruda) {
+          eruda.show();
+          return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/eruda';
+        script.onload = function () {
+          eruda.init();
+          eruda.show();
+        };
+        document.body.appendChild(script);
+      });
+    }
+
     document.getElementById('modal').addEventListener('click', (e) => {
       if (e.target.id === 'modal') closeModal();
     });
@@ -2374,11 +2590,6 @@
       if (e.target.id === 'posterModal') closePosterModal();
     });
     document.getElementById('posterCloseBtn').addEventListener('click', closePosterModal);
-    document.getElementById('posterNativeShare').addEventListener('click', () => {
-      sharePosterImage().catch(() => {
-        document.getElementById('posterDownload').click();
-      });
-    });
 
     async function init() {
       await fetchExtremeEvents();
@@ -2388,6 +2599,8 @@
       renderEvents();
       renderTimeline();
       initAppEnvironment();
+      initCnzzStat();
+      initTestEnvTag();
     }
 
     init();
